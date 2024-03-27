@@ -28,7 +28,7 @@ const handleRequest = frames(async (ctx) => {
     const res = await fetch(`${process.env.ROLLUP_HOST}/score/${userFid}`);
 
     const json = await res.json();
-    const userScoreData: UserReputation | undefined | null = json;
+    const userScoreData: UserReputation | undefined | null = json.userScore;
 
     console.log(userScoreData);
 

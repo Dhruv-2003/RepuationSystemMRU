@@ -1,9 +1,15 @@
 import { AddressLike, Wallet } from "ethers";
 import { CalculateRepScoreInputsType } from "./getDataViaAPIs";
-import { stackrConfig } from "../../../rollup/stackr.config";
-import { schemas } from "../../../rollup/src/actions";
+import { schemas } from "./actions";
 
-const { domain } = stackrConfig;
+const domain = {
+  name: "Stackr MVP v0",
+  version: "1",
+  chainId: 15,
+  verifyingContract: "0x318797a65c1B1Af4d2B74E6Dca6d5f188BBF0F3F",
+  salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+};
+
 type ActionName = keyof typeof schemas;
 
 export type UserReputation = {

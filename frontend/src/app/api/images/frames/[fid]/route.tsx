@@ -1,30 +1,36 @@
 // ./app/frames/route.tsx
 /* eslint-disable react/jsx-key */
-import { UserReputationScoreType } from "@/utils/calculateScore";
+
+import { UserReputation } from "@/utils/rollup";
 
 import { ImageResponse } from "@vercel/og";
+import { getUserDataForFid } from "frames.js";
 
 export const GET = async (
   req: Request,
   {
     params,
   }: {
-    params: { handle: string };
+    params: { fid: string };
   }
 ) => {
-  const userHandle = params.handle;
-  console.log(userHandle);
+  const userfid = params.fid;
+  console.log(userfid);
 
   // get the data for that user from kv
   const response = await fetch(
-    `${process.env.HOST}/api/calculateScore/${userHandle}`
+    `${process.env.HOST}/api/calculateScore/${userfid}`
   );
 
-  const userData: UserReputationScoreType | undefined = await response.json();
-  console.log(userData);
+  const userScoreData: UserReputation | undefined = (await response.json())
+    .userScore;
+  console.log(userScoreData);
+
+  const userFData = await getUserDataForFid({ fid: Number(params.fid) });
+
   // render it
   // Might want to check the data and revert saying refresh Again
-  if (userData) {
+  if (userScoreData) {
     return new ImageResponse(
       (
         <div tw=" flex h-[476px] w-[910px] items-center justify-between w-full bg-white">
@@ -47,7 +53,7 @@ export const GET = async (
               }}
               tw=" flex items-center flex-col justify-center p-8 h-40 w-40 rounded-full text-white border border-white shadow-2xl	"
             >
-              <span tw="text-5xl font-bold">{userData.totalScore}</span>
+              <span tw="text-5xl font-bold">{userScoreData.totalScore}</span>
               <span tw=" text-xl font-semibold">of 1000</span>
             </div>
             <p tw=" text-base font-medium text-white mt-6">
@@ -64,7 +70,7 @@ export const GET = async (
           >
             <div tw="flex items-center justify-between w-full mb-4">
               <h4 tw=" text-2xl font-semibold text-indigo-500">
-                {userData.userhandle}
+                {userFData?.username}
               </h4>
               <img
                 src={
@@ -79,7 +85,7 @@ export const GET = async (
                 User Engagement
               </span>
               <span tw=" text-base font-semibold text-cyan-500">
-                {userData.engagementScore}
+                {userScoreData.engagementScore}
                 <span tw=" text-black"> / 200</span>
               </span>
             </div>
@@ -88,14 +94,14 @@ export const GET = async (
                 Cast Frequency
               </span>
               <span tw=" text-base font-semibold text-cyan-500">
-                {userData.castFrequencyScore}
+                {userScoreData.castFrequencyScore}
                 <span tw=" text-black"> / 150</span>
               </span>
             </div>
             <div tw=" mb-4 flex justify-between">
               <span tw=" text-base font-medium text-violet-500">Longevity</span>
               <span tw=" text-base font-semibold text-cyan-500">
-                {userData.longevityScore}
+                {userScoreData.longevityScore}
                 <span tw=" text-black"> / 100</span>
               </span>
             </div>
@@ -104,7 +110,8 @@ export const GET = async (
                 Network Size
               </span>
               <span tw=" text-base font-semibold text-cyan-500">
-                {userData.followingScore} <span tw=" text-black"> / 100</span>
+                {userScoreData.followingScore}{" "}
+                <span tw=" text-black"> / 100</span>
               </span>
             </div>
             <div tw=" mb-4 flex justify-between">
@@ -112,7 +119,7 @@ export const GET = async (
                 Farcaster Activity
               </span>
               <span tw=" text-base font-semibold text-cyan-500">
-                {userData.reactionLikeScore + userData.reactionRecastScore}{" "}
+                {userScoreData.reactionScore}{" "}
                 <span tw=" text-black"> / 100</span>
               </span>
             </div>
@@ -121,7 +128,8 @@ export const GET = async (
                 Onchain Activty
               </span>
               <span tw=" text-base font-semibold text-cyan-500">
-                {userData.onChainScore} <span tw=" text-black"> / 200</span>
+                {userScoreData.onChainScore}{" "}
+                <span tw=" text-black"> / 200</span>
               </span>
             </div>
           </div>

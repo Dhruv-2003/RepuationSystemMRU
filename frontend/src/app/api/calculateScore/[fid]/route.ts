@@ -13,7 +13,7 @@ export async function GET(
 
     const json = await res.json();
     console.log(json);
-    const userReputationScore = json;
+    const userReputationScore = json.userScore;
 
     // have to modify and add extra user info for user farcaster info
     const userFData = await getUserDataForFid({ fid: Number(params.fid) });
@@ -41,7 +41,13 @@ export async function POST(
   try {
     // invoker User calculateData and then get the score and detailed info to store it on the KV
     console.log(params.fid);
-    const userScoreData = await getDataForScore(params.fid);
+    const userFData = await getUserDataForFid({ fid: Number(params.fid) });
+    if (!userFData?.username) {
+      console.log("Username unavailable");
+      return;
+    }
+
+    const userScoreData = await getDataForScore(userFData?.username);
 
     console.log(userScoreData);
     if (userScoreData) {
