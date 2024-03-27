@@ -3,16 +3,17 @@ import React, { useEffect, useState } from "react";
 import { fetchMetadata } from "frames.js/next";
 import StatsCard from "@/components/stats-card";
 import Heatmap from "@/components/heat-map";
-import { UserReputationScoreType } from "@/utils/calculateScore";
+import { UserReputation } from "@/utils/rollup";
+import { UserDataReturnType } from "frames.js";
 
-export default function Score({ params }: { params: { handle: string } }) {
+export default function Score({ params }: { params: { fid: string } }) {
   const [userData, setUserData] = useState<
-    UserReputationScoreType | undefined
+    (UserReputation & UserDataReturnType) | undefined
   >();
 
   const getUserData = async () => {
     try {
-      const response = await fetch(`/api/calculateScore/${params.handle}`);
+      const response = await fetch(`/api/calculateScore/${params.fid}`);
       const data = await response.json();
 
       // console.log(data);
@@ -26,7 +27,7 @@ export default function Score({ params }: { params: { handle: string } }) {
     if (!userData) {
       getUserData();
     }
-  }, [params.handle]);
+  }, [params.fid]);
 
   return (
     <div className="flex items-center flex-col justify-normal mt-16 min-h-screen gap-10 w-[80vw] mx-auto pb-16">

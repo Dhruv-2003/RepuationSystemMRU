@@ -36,7 +36,7 @@ export default function Heatmap({ fid }: { fid: number | undefined }) {
 
   useEffect(() => {
     if (!selected && fid) {
-      getUserData(fid);
+      // getUserData(fid);
     }
   }, [fid]);
 

@@ -1,7 +1,9 @@
 // ./app/frames/route.tsx
 /* eslint-disable react/jsx-key */
-import { UserReputationScoreType } from "@/utils/getDataViaAPIs";
+
+import { UserReputation } from "@/utils/rollup";
 import { kv } from "@vercel/kv";
+import { getUserDataForFid } from "frames.js";
 import { createFrames, Button } from "frames.js/next";
 
 const frames = createFrames();
@@ -9,24 +11,23 @@ const frames = createFrames();
 const handleRequest = frames(async (ctx) => {
   const url = ctx.url;
   const path = url.pathname.split("/");
-  const userHandle = path[path.length - 1];
-  console.log(userHandle);
+  const userFid = path[path.length - 1];
+  console.log(userFid);
 
   // get the data for that user from kv
   // const response = await fetch(
   //   `${process.env.HOST}/api/calculateScore/${userHandle}`
   // );
+  const res = await fetch(`${process.env.ROLLUP_HOST}/score/${userFid}`);
 
-  const userData: UserReputationScoreType | undefined | null = await kv.get(
-    userHandle
-  );
+  const json = await res.json();
+  const userScoreData: UserReputation | undefined | null = json;
 
-  // const userData: UserReputationScoreType | undefined = await response.json();
+  const userFData = await getUserDataForFid({ fid: Number(userFid) });
 
-  // console.log(userData);
   // render it
   // Might want to check the data and revert saying refresh Again
-  if (userData) {
+  if (userScoreData) {
     return {
       // image: `${process.env.HOST}/api/images/frames/${userHandle}`,
       image: (
@@ -51,7 +52,7 @@ const handleRequest = frames(async (ctx) => {
               tw=" flex items-center flex-col justify-center p-8 h-40 w-40 rounded-full text-white border border-white shadow-2xl	"
             >
               <span style={{ fontWeight: 800 }} tw="text-5xl">
-                {userData.totalScore}
+                {userScoreData.totalScore}
               </span>
               <span tw=" text-xl font-semibold">of 1000</span>
             </div>
@@ -69,12 +70,12 @@ const handleRequest = frames(async (ctx) => {
           >
             <div tw="flex items-center justify-between w-full mb-4">
               <h4 style={{ fontWeight: 600 }} tw=" text-2xl text-indigo-500">
-                {userData.userhandle}
+                {userFData?.username}
               </h4>
               <img
                 src={
-                  userData.profile
-                    ? userData.profile
+                  userFData?.profileImage
+                    ? userFData.profileImage
                     : "https://pbs.twimg.com/profile_images/1732439974497394688/ezW7LwKq_400x400.jpg"
                 }
                 alt="pfp"
@@ -86,51 +87,50 @@ const handleRequest = frames(async (ctx) => {
                 User Engagement
               </span>
               <span style={{ fontWeight: 600 }} tw=" text-base text-cyan-500">
-                {userData.engagementScore}
+                {userScoreData.engagementScore}
                 <span tw=" text-black"> / 200</span>
               </span>
             </div>
             <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
               <span tw="text-base text-red-500">Cast Frequency</span>
               <span tw=" text-base text-cyan-500">
-                {userData.castFrequencyScore}
+                {userScoreData.castFrequencyScore}
                 <span tw=" text-black"> / 150</span>
               </span>
             </div>
             <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
               <span tw=" text-base text-violet-500">Longevity</span>
               <span tw=" text-base text-cyan-500">
-                {userData.longevityScore}
+                {userScoreData.longevityScore}
                 <span tw=" text-black"> / 100</span>
               </span>
             </div>
             <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
               <span tw="text-base text-amber-500">Network Size</span>
               <span tw=" text-base text-cyan-500">
-                {userData.followingScore} <span tw=" text-black"> / 100</span>
+                {userScoreData.followingScore}{" "}
+                <span tw=" text-black"> / 100</span>
               </span>
             </div>
             <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
               <span tw="text-base text-lime-500">Farcaster Activity</span>
               <span tw=" text-base text-cyan-500">
-                {userData.reactionLikeScore + userData.reactionRecastScore}{" "}
+                {userScoreData.reactionScore}{" "}
                 <span tw=" text-black"> / 100</span>
               </span>
             </div>
             <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
               <span tw="text-base text-teal-500">Onchain Activty</span>
               <span tw=" text-base text-cyan-500">
-                {userData.onChainScore} <span tw=" text-black"> / 200</span>
+                {userScoreData.onChainScore}{" "}
+                <span tw=" text-black"> / 200</span>
               </span>
             </div>
           </div>
         </div>
       ),
       buttons: [
-        <Button
-          action="link"
-          target={`${process.env.HOST}/score/${userHandle}`}
-        >
+        <Button action="link" target={`${process.env.HOST}/score/${userFid}`}>
           Profile
         </Button>,
       ],

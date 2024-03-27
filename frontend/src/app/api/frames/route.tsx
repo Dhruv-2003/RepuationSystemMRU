@@ -15,7 +15,6 @@ const handleRequest = frames(async (ctx) => {
         Generate your Score now →
       </Button>,
     ],
-    textInput: "Farcaster Handle...",
     accepts: [
       {
         id: "farcaster",

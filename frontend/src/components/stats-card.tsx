@@ -4,12 +4,13 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import { ImageDown, ImageIcon, MoveUpRight, Share } from "lucide-react";
 import { Separator } from "./ui/separator";
-import { UserReputationScoreType } from "@/utils/calculateScore";
+import { UserDataReturnType } from "frames.js";
+import { UserReputation } from "@/utils/rollup";
 
 export default function StatsCard({
   userData,
 }: {
-  userData: UserReputationScoreType | undefined;
+  userData: (UserReputation & UserDataReturnType) | undefined;
 }) {
   return (
     // <Card className="grid grid-cols-12 items-center gap-3 shadow-sm p-10 bg-transparent backdrop-blur-md">
@@ -31,12 +32,12 @@ export default function StatsCard({
           <div className="flex flex-col gap-6 card-details w-full px-8 py-6">
             <div className="flex items-center justify-between w-full">
               <h4 className=" text-2xl font-semibold text-indigo-500">
-                {userData.fname}
+                {userData.username}
               </h4>
               <img
                 src={
-                  userData.profile
-                    ? userData.profile
+                  userData.profileImage
+                    ? userData.profileImage
                     : "https://pbs.twimg.com/profile_images/1732439974497394688/ezW7LwKq_400x400.jpg"
                 }
                 alt="pfp"
@@ -86,7 +87,7 @@ export default function StatsCard({
                 Farcaster Activity
               </span>
               <span className="card-details__result text-xl font-semibold">
-                {userData.reactionLikeScore + userData.reactionRecastScore}
+                {userData.reactionScore}
                 <span className="card-details__max">/ 100</span>
               </span>
             </div>

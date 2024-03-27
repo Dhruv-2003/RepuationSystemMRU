@@ -7,14 +7,14 @@ import HeatMap from "@uiw/react-heat-map";
 export async function generateMetadata({
   params,
 }: {
-  params: { handle: string };
+  params: { fid: string };
 }) {
   return {
     title: "Farcaster Reputation Enginne",
     // provide a full URL to your /frames endpoint
     other: await fetchMetadata(
       new URL(
-        `/api/frames/${params.handle}`,
+        `/api/frames/${params.fid}`,
         process.env.NEXT_PUBLIC_HOST
           ? `${process.env.NEXT_PUBLIC_HOST}`
           : "http://localhost:3000"
@@ -23,7 +23,7 @@ export async function generateMetadata({
   };
 }
 
-export default function Frames({ params }: { params: { handle: string } }) {
+export default function Frames({ params }: { params: { fid: string } }) {
   return (
     <div className=" flex items-center justify-center gap-5 min-h-[80vh]">
       <div className="flex flex-col items-center justify-center bg-white h-[400px] w-[800px]">

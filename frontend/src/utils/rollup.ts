@@ -1,10 +1,24 @@
-import { Wallet } from "ethers";
+import { AddressLike, Wallet } from "ethers";
 import { CalculateRepScoreInputsType } from "./getDataViaAPIs";
 import { stackrConfig } from "../../../rollup/stackr.config";
 import { schemas } from "../../../rollup/src/actions";
 
 const { domain } = stackrConfig;
 type ActionName = keyof typeof schemas;
+
+export type UserReputation = {
+  fid: number;
+  address: AddressLike;
+  engagementScore: number;
+  castFrequencyScore: number;
+  postQualityScore: number;
+  reactionScore: number;
+  longevityScore: number;
+  onChainScore: number;
+  followingScore: number;
+  totalScore: number;
+  lastUpdated: number;
+};
 
 export const createRepScoreAction = async (
   userScoreData: CalculateRepScoreInputsType
@@ -32,7 +46,7 @@ export const createRepScoreAction = async (
     payload,
   });
 
-  const res = await fetch(`http://localhost:5000/${actionName}`, {
+  const res = await fetch(`${process.env.ROLLUP_HOST}/${actionName}`, {
     method: "POST",
     body,
     headers: {
@@ -71,7 +85,7 @@ export const updateRepScoreAction = async (
     payload,
   });
 
-  const res = await fetch(`http://localhost:5000/${actionName}`, {
+  const res = await fetch(`${process.env.ROLLUP_HOST}/${actionName}`, {
     method: "POST",
     body,
     headers: {

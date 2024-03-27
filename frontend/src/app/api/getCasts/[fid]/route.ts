@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { kv } from "@vercel/kv";
-import { calculateScore } from "@/utils/calculateScore";
 import { getUserCasts } from "@/utils/neynar";
 
 export async function GET(

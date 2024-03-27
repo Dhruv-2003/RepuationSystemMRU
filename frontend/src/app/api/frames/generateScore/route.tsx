@@ -1,39 +1,45 @@
 // ./app/frames/route.tsx
 /* eslint-disable react/jsx-key */
+import { UserReputation } from "@/utils/rollup";
 import { getUserDataForFid } from "frames.js";
 import { createFrames, Button } from "frames.js/next";
 
 const frames = createFrames();
 
 const handleRequest = frames(async (ctx) => {
-  // console.log(ctx.message);
+  console.log(ctx.message);
   if (ctx.message) {
     // Get the users fid
     const userFid: number = ctx?.message.requesterFid;
-    const _input = ctx.message.inputText;
+    // const _input = ctx.message.inputText;
 
     // const userFData = await getUserDataForFid({ fid: userFid });
     // const userHandle = userFData?.username;
     // console.log(userHandle);
 
-    const userHandle = _input;
+    // const userHandle = _input;
 
-    // try to fetch the data for the user\
+    // try to fetch the data for the user from the rollup
     // get Data if present from KV
-    const response = await fetch(
-      `${process.env.HOST}/api/calculateScore/${userHandle}`
-    );
-    const userData = await response.json();
-    console.log(userData);
+    // const response = await fetch(
+    //   `${process.env.HOST}/api/calculateScore/${userFid}`
+    // );
+    // const userScoreData: UserReputation = await response.json();
+    const res = await fetch(`${process.env.ROLLUP_HOST}/score/${userFid}`);
 
-    if (!userData) {
+    const json = await res.json();
+    const userScoreData: UserReputation | undefined | null = json;
+
+    console.log(userScoreData);
+
+    if (!userScoreData) {
       // Otherwise
       // request the User data for score calculate
       // don't wait for that
 
       // Send a refresh Frame first
       // send a POST request for generating the Score
-      fetch(`${process.env.HOST}/api/calculateScore/${userHandle}`, {
+      fetch(`${process.env.HOST}/api/calculateScore/${userFid}`, {
         method: "POST",
       });
 
@@ -73,6 +79,7 @@ const handleRequest = frames(async (ctx) => {
       };
     } else {
       // Otherwise return the frame with user's profile
+      const userFData = await getUserDataForFid({ fid: userFid });
 
       return {
         image: (
@@ -97,7 +104,7 @@ const handleRequest = frames(async (ctx) => {
                 tw=" flex items-center flex-col justify-center p-8 h-40 w-40 rounded-full text-white border border-white shadow-2xl	"
               >
                 <span style={{ fontWeight: 800 }} tw="text-5xl">
-                  {userData.totalScore}
+                  {userScoreData.totalScore}
                 </span>
                 <span tw=" text-xl font-semibold">of 1000</span>
               </div>
@@ -115,11 +122,13 @@ const handleRequest = frames(async (ctx) => {
             >
               <div tw="flex items-center justify-between w-full mb-4">
                 <h4 style={{ fontWeight: 600 }} tw=" text-2xl text-indigo-500">
-                  {userData.userhandle}
+                  {userFData?.username}
                 </h4>
                 <img
                   src={
-                    "https://pbs.twimg.com/profile_images/1732439974497394688/ezW7LwKq_400x400.jpg"
+                    userFData?.profileImage
+                      ? userFData.profileImage
+                      : "https://pbs.twimg.com/profile_images/1732439974497394688/ezW7LwKq_400x400.jpg"
                   }
                   alt="pfp"
                   tw="rounded-full h-20 w-20 shadow-2xl broder-2"
@@ -133,51 +142,50 @@ const handleRequest = frames(async (ctx) => {
                   User Engagement
                 </span>
                 <span style={{ fontWeight: 600 }} tw=" text-base text-cyan-500">
-                  {userData.engagementScore}
+                  {userScoreData.engagementScore}
                   <span tw=" text-black"> / 200</span>
                 </span>
               </div>
               <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
                 <span tw="text-base text-red-500">Cast Frequency</span>
                 <span tw=" text-base text-cyan-500">
-                  {userData.castFrequencyScore}
+                  {userScoreData.castFrequencyScore}
                   <span tw=" text-black"> / 150</span>
                 </span>
               </div>
               <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
                 <span tw=" text-base text-violet-500">Longevity</span>
                 <span tw=" text-base text-cyan-500">
-                  {userData.longevityScore}
+                  {userScoreData.longevityScore}
                   <span tw=" text-black"> / 100</span>
                 </span>
               </div>
               <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
                 <span tw="text-base text-amber-500">Network Size</span>
                 <span tw=" text-base text-cyan-500">
-                  {userData.followingScore} <span tw=" text-black"> / 100</span>
+                  {userScoreData.followingScore}{" "}
+                  <span tw=" text-black"> / 100</span>
                 </span>
               </div>
               <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
                 <span tw="text-base text-lime-500">Farcaster Activity</span>
                 <span tw=" text-base text-cyan-500">
-                  {userData.reactionLikeScore + userData.reactionRecastScore}{" "}
+                  {userScoreData.reactionScore}{" "}
                   <span tw=" text-black"> / 100</span>
                 </span>
               </div>
               <div style={{ fontWeight: 600 }} tw=" mb-4 flex justify-between">
                 <span tw="text-base text-teal-500">Onchain Activty</span>
                 <span tw=" text-base text-cyan-500">
-                  {userData.onChainScore} <span tw=" text-black"> / 200</span>
+                  {userScoreData.onChainScore}{" "}
+                  <span tw=" text-black"> / 200</span>
                 </span>
               </div>
             </div>
           </div>
         ),
         buttons: [
-          <Button
-            action="link"
-            target={`${process.env.HOST}/score/${userHandle}`}
-          >
+          <Button action="link" target={`${process.env.HOST}/score/${userFid}`}>
             Profile
           </Button>,
           <Button action="post">Mint</Button>,
