@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --white: #fff;
+    --gradient1: linear-gradient(180deg, #75f 0%, #6943ff 0.01%, #2f2ce9 100%);
+    --gradient2: linear-gradient(180deg, #4d21c9 0%, rgba(37, 33, 201, 0) 100%, rgba(37, 33, 201, 0) 100%);
+    --light-blue: #cac9ff;
+    --dark-navy: #303b59;
+    --red: #f55;
+    --red-95-white: linear-gradient(0deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%), #f55;
+    --yellow: #ffb21e;
+    --yellow-95-white: linear-gradient(0deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%), #ffb21e;
+    --turquoise: #00bb8f;
+    --turquoise-95-white: linear-gradient(0deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%), #00bb8f;
+    --navy-blue: #1125d6;
+    --navy-blue-95-white: linear-gradient(0deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%), #1125d6;
+    --very-light-blue: #ecf2ff;
+}
+
+
+.gradient-bg {
+    background-image: url("../../public/assets/bg-gradient.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    /* color: #f7f6fb; 
+}
+
+
+*::before,
+*::after {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    /* font-size: 78.5%; */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--very-light-blue);
+}
+
+.cards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    background-color: var(--white);
+    font-family: "Hanken Grotesk", sans-serif;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 375px;
+    border-radius: 0rem 0rem 3.2rem 3.2rem;
+}
+
+.card-score {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.3rem;
+    color: hsl(221, 100%, 96%);
+    background: var(--gradient1);
+    background-position: center;
+}
+
+.card-score__title {
+    margin: 3.5rem 0;
+    font-size: 2.4rem;
+    color: var(--light-blue);
+    font-weight: 700;
+}
+
+.card-score__result {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    background: var(--gradient2);
+    margin-bottom: 2.8rem;
+}
+
+.card-score__result__count {
+    font-size: 7.2rem;
+    font-weight: 800;
+    line-height: 7.2rem;
+}
+
+.card-score__result__max {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--light-blue);
+}
+
+.card-score__heading {
+    font-size: 3.2rem;
+    font-weight: 700;
+    margin-bottom: 1.4rem;
+}
+
+.card-score__text {
+    padding: 0 5.4rem;
+    margin-bottom: 4rem;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--light-blue);
+}
+
+.card-details {
+    display: flex;
+    flex-direction: column;
+    padding: 2.4rem 3rem;
+    border-radius: 3.2rem;
+}
+
+.card-details__title {
+    margin-left: 0.2rem;
+    margin-bottom: 2.4rem;
+    font-size: 1.8rem;
+    color: var(--dark-navy);
+    font-weight: 700;
+}
+
+.card-details__score {}
+
+.card-details__score:has(.card-details__category-one) {
+    color: var(--red);
+    background-color: var(--red-95-white);
+}
+
+.card-details__score:has(.card-details__category-two) {
+    color: var(--yellow);
+    background-color: var(--yellow-95-white);
+}
+
+.card-details__score:has(.card-details__category-three) {
+    color: var(--turquoise);
+
+    background-color: var(--turquoise-95-white);
+}
+
+.card-details__score:has(.card-details__category-four) {
+    color: var(--navy-blue);
+    background-color: var(--navy-blue-95-white);
+    margin-bottom: 0.4rem;
+}
+
+.card-details__result {
+    color: var(--dark-navy);
+    font-weight: 700;
+}
+
+.card-details__max {
+    margin-left: 0.8rem;
+    opacity: 0.5;
+}
+
+.card-details__btn {
+    padding: 1.7rem 0;
+    margin-bottom: 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 12.8rem;
+    background: var(--dark-navy);
+    color: var(--white);
+    font-size: 1.8rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.card-details__btn:hover {
+    background: var(--gradient1);
+}
+
+@media (min-width: 750px) {
+    .cards {
+        border-radius: 3.2rem;
+    }
+
+    .card {
+        border-radius: 3.2rem;
+    }
+
+    .card-score__text {
+        font-size: 1.8rem;
+    }
+
+    .card-details__title {
+        font-size: 2.4rem;
+    }
+
+    .card-details__score {
+        font-size: 1.8rem;
+    }
+}
