@@ -1,6 +1,5 @@
 // import { getUserEngagmentData } from "@/utils/getOpenRankData";
 import { getUserOnchainData } from "@/utils/airstack";
-import { calculateScore } from "@/utils/calculateScore";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -9,8 +8,6 @@ export async function POST(request: NextRequest) {
     const userHandle = "dwr.eth";
     const userFid = 3;
     // const userAddress = "0xB72a04B01BB80DfD6a42ea8E0907B892286113F2";
-
-    await calculateScore(userHandle);
 
     return new Response("ReuestCall Successful", {
       headers: {

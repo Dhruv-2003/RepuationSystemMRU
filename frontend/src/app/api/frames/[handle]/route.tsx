@@ -1,6 +1,6 @@
 // ./app/frames/route.tsx
 /* eslint-disable react/jsx-key */
-import { UserReputationScoreType } from "@/utils/calculateScore";
+import { UserReputationScoreType } from "@/utils/getDataViaAPIs";
 import { kv } from "@vercel/kv";
 import { createFrames, Button } from "frames.js/next";
 

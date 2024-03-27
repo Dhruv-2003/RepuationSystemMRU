@@ -27,47 +27,61 @@ export interface UserReputationScoreType {
   totalScore: number;
 }
 
-export const calculateScore = async (
+export interface CalculateRepScoreInputsType {
+  fid: number;
+  engagementRankPercentile: number;
+  castFrequency: number;
+  postQuality: number;
+  reactionLikes: number;
+  reactionsRecast: number;
+  followingRankPercentile: number;
+  userCreationTimePeriod: number;
+  totalOnChainTransfer: number;
+  totalOnChainBalance: number;
+  totalPoaps: number;
+  ownsENSDomain: boolean;
+  isXMTPEnabled: boolean;
+}
+
+export const getDataForScore = async (
   userHandle: string
-): Promise<UserReputationScoreType | undefined> => {
+): Promise<CalculateRepScoreInputsType | undefined> => {
   try {
     // 1. get Engagment ranking from openranks ( out of 200 )
     const engagementRank = await getUserGlobalEngagmentRanking(userHandle);
-    const engagementPoints = engagementRank.percentile * 2;
     const fid = engagementRank.fid;
+
     // get Casts by the user
-
-    const userFidData = await getUserDataForFid({ fid: fid });
-
     // const casts = await getUserAuthoredCasts(fid);
     const casts2 = await getUserCasts(fid);
     // 2.calculate the post freq score ( out of 150 )
-    const castFrequencyScore = await calculatePostFreq(casts2);
+    const castFrequency = await calculatePostFreq(casts2);
+
     // 3.calculate the post quality score ( out of 50 )
-    const postQualityScore = 40;
-    //
+    const postQuality = 40;
+
     // fetch user reactions
     // 4. get the no of likes (out of 50)
     const reactionsLike = await getUserLikes(fid);
-    const reactionLikeScore =
-      ((await calculateReactionFreq(reactionsLike)) * 50) / 100;
+    const filteredReactionsLike = await calculateReactionFreq(reactionsLike);
     // 4. get the no of recasts  (out of 50)
     const reactionsRecast = await getUserRecasts(fid);
-    const reactionRecastScore =
-      ((await calculateReactionFreq(reactionsRecast)) * 50) / 100;
-    // console.log(reactionLikeScore, reactionRecastScore);
-    //
+    const filteredReactionsRecast = await calculateReactionFreq(
+      reactionsRecast
+    );
+
     // 5. Take the no of followers to calculate the  following score (out of 100)
     const followingRank = await getUserGlobalFollowingRanking(userHandle);
-    const followingPoints = followingRank.percentile;
+
     // // fetch user data from Airstack
     const userData = await getUserAllData(userHandle);
     // console.log(userData);
 
     // // 6. Get the account creation time for user to calculate the longevity score (out of 100)
     const userCreatedTime = new Date(userData.userCreatedAtBlockTimestamp);
-    const longevityScore = await calculateLongevityScore(userCreatedTime);
-    // console.log(longevityScore);
+    const userCreationTimePeriod = await calculateLongevityScore(
+      userCreatedTime
+    );
 
     // fetch users onchain activity data from airstack
     // 7. get the onchain activity like tokens transfer , nft minting , etc.
@@ -76,36 +90,22 @@ export const calculateScore = async (
         ? userData.userAssociatedAddresses[1]
         : userData.userAddress
     );
-    const onChainScore = await calculateOnchainScore(userOnchainData);
-
-    const finalScore = Math.round(
-      engagementPoints +
-        followingPoints +
-        castFrequencyScore +
-        postQualityScore +
-        reactionLikeScore +
-        reactionRecastScore +
-        longevityScore +
-        onChainScore
-    );
-
-    console.log(fid, finalScore);
+    const onChainScoreData = await calculateOnchainScore(userOnchainData);
 
     return {
       fid: fid,
-      fname: engagementRank.fname,
-      userhandle: userHandle,
-      //@ts-ignore
-      profile: userFidData?.profileImage,
-      engagementScore: engagementPoints,
-      castFrequencyScore: castFrequencyScore,
-      postQualityScore: postQualityScore,
-      reactionLikeScore: reactionLikeScore,
-      reactionRecastScore: reactionRecastScore,
-      longevityScore: longevityScore,
-      onChainScore: onChainScore,
-      followingScore: followingPoints,
-      totalScore: finalScore,
+      engagementRankPercentile: engagementRank.percentile,
+      castFrequency: castFrequency,
+      postQuality: postQuality,
+      reactionLikes: filteredReactionsLike,
+      reactionsRecast: filteredReactionsRecast,
+      followingRankPercentile: followingRank.percentile,
+      userCreationTimePeriod: userCreationTimePeriod,
+      totalOnChainTransfer: onChainScoreData.totalTransfers,
+      totalOnChainBalance: onChainScoreData.totalBalance,
+      totalPoaps: onChainScoreData.totalPoaps,
+      ownsENSDomain: onChainScoreData.ownsENSDomain,
+      isXMTPEnabled: onChainScoreData.isXMTPEnabled,
     };
   } catch (error) {
     console.log(error);
@@ -137,12 +137,6 @@ const calculatePostFreq = async (casts: any[]) => {
 const calculateReactionFreq = async (reactions: any[]) => {
   const currentDate = new Date();
 
-  //   const authoredCasts = casts.filter((cast: any) => {
-  //     return !cast.parentHash;
-  //   });
-
-  // might want to filter that they were the posts created by the user , only the post authored directly by the user , so there should be no parentAuthor & no parentHash
-
   const timeFilteredReactions = reactions.filter((cast: any) => {
     const postDate = new Date(cast.reaction_timestamp);
     const diffInDays = Math.floor(
@@ -162,11 +156,7 @@ const calculateLongevityScore = async (accountCreationDate: Date) => {
       (1000 * 60 * 60 * 24)
   );
 
-  if (diffInDays > 200) {
-    return 100;
-  } else {
-    return (diffInDays / 200) * 100;
-  }
+  return diffInDays;
 };
 
 export const calculateOnchainScore = async (userOnchainData: any) => {
@@ -176,7 +166,6 @@ export const calculateOnchainScore = async (userOnchainData: any) => {
     userOnchainData.ethereumTransfer.length +
     userOnchainData.polygonTransfer.length +
     userOnchainData.baseTransfer.length;
-  // console.log(totalTransfers);
 
   let totalBalance: number = 0;
 
@@ -192,20 +181,13 @@ export const calculateOnchainScore = async (userOnchainData: any) => {
     totalBalance += balance.formattedAmount;
   });
 
-  let balancePoint = totalBalance > 1000 ? 75 : (totalBalance * 75) / 1000;
-  // console.log(balancePoint);
+  let totalPoaps = userOnchainData.poaps.length;
 
-  let poapsPoint = userOnchainData.poaps.length;
-  // console.log(poapsPoint);
-
-  let domainsPoint = userOnchainData.domains.length * 15;
-  // console.log(domainsPoint);
-
-  let xmtpPoint = userOnchainData.xmtp.isXMTPEnabled ? 10 : 0;
-  // console.log(xmtpPoint);
-
-  const totalOnchainPoints =
-    totalTransfers + balancePoint + poapsPoint + domainsPoint + xmtpPoint;
-
-  return totalOnchainPoints;
+  return {
+    totalTransfers,
+    totalBalance,
+    totalPoaps,
+    ownsENSDomain: userOnchainData.domains.length ? true : false,
+    isXMTPEnabled: userOnchainData.xmtp.isXMTPEnabled,
+  };
 };
