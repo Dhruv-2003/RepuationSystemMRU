@@ -102,11 +102,7 @@ const createRepScoreHandler: STF<ReputationSystem> = {
       throw new Error("Invalid inputs");
     }
 
-    if (
-      state.userRepuations.find(
-        (user) => user.address === msgSender || user.fid === inputs.fid
-      )
-    ) {
+    if (state.userRepuations.find((user) => user.fid === inputs.fid)) {
       throw new Error("User reputation already exists");
     }
 
@@ -163,9 +159,9 @@ const updateRepScoreHandler: STF<ReputationSystem> = {
       throw new Error("User reputation doesn't exist");
     }
 
-    if (msgSender != userRep.address) {
-      throw new Error("Only Owner Can updater reputation score");
-    }
+    // if (msgSender != userRep.address) {
+    //   throw new Error("Only Owner Can updater reputation score");
+    // }
 
     const repScore = calculateRepScore({
       engagementRankPercentile: inputs.engagementRankPercentile,

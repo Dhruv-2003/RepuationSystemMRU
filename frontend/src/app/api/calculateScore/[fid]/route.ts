@@ -24,7 +24,15 @@ export async function GET(
     };
 
     // console.log(`Response: ${JSON.stringify(json, null, 2)}`);
-    // check if the last Time Updated was a long ago , then just refresh the score
+    // check if the last Time Updated was more than a month ago , then just refresh the score
+    if (
+      Math.round(new Date().getTime() / 1000) -
+        userReputationScore.lastUpdated >
+      2629743
+    ) {
+      // fetch();
+      // Send post request to refreshScore
+    }
 
     return new Response(JSON.stringify(userData), {
       status: 200,
