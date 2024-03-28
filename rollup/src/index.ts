@@ -5,6 +5,9 @@ import { Playground } from "@stackr/sdk/plugins";
 import { schemas } from "./actions.ts";
 import { ReputationMachine, mru } from "./reputation.ts";
 import { reducers } from "./reducers.ts";
+import { stackrConfig } from "../stackr.config";
+
+const { domain } = stackrConfig;
 
 console.log("Starting server...");
 
@@ -84,6 +87,24 @@ app.get("/", (_req: Request, res: Response) => {
   return res.send({ state: reputationMachine?.state.unwrap() });
 });
 
-app.listen(3000, () => {
-  console.log("listening on port 3000");
+app.get("/score/:fid", (_req: Request, res: Response) => {
+  const { fid } = _req.params;
+
+  const state = reputationMachine?.state.unwrap();
+  const userScore = state?.find((user) => user.fid === Number(fid));
+  return res.send({ userScore });
+});
+
+type ActionName = keyof typeof schemas;
+
+app.get("/getEIP712Types/:action", (_req: Request, res: Response) => {
+  // @ts-ignore
+  const { action }: { action: ActionName } = _req.params;
+
+  const eip712Types = schemas[action].EIP712TypedData.types;
+  return res.send({ eip712Types });
+});
+
+app.listen(5050, () => {
+  console.log("listening on port 5050");
 });

@@ -19,7 +19,7 @@ const getBody = async (actionName: ActionName, wallet: Wallet) => {
   const payload =
     actionName == "createRepScore"
       ? {
-          fid: 3,
+          fid: 4,
           timestamp: Math.round(date.getTime() / 1000),
           engagementRankPercentile: 99,
           castFrequency: 150,
@@ -70,7 +70,7 @@ const run = async (actionName: ActionName, wallet: Wallet) => {
   const start = Date.now();
   const body = await getBody(actionName, wallet);
 
-  const res = await fetch(`http://localhost:3000/${actionName}`, {
+  const res = await fetch(`http://localhost:5050/${actionName}`, {
     method: "POST",
     body,
     headers: {

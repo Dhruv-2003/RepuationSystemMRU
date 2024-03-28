@@ -1,7 +1,7 @@
 import { init, fetchQuery } from "@airstack/node";
 import { userFidQuery, userOnchainQuery } from "./airstackQueries";
 import dotenv from "dotenv";
-import { calculateOnchainScore } from "./calculateScore";
+
 dotenv.config();
 
 init("120c285f6df44601b48fd17a673be1bc", "dev");

@@ -185,9 +185,9 @@ export const calculateOnchainScore = async (userOnchainData: any) => {
 
   return {
     totalTransfers,
-    totalBalance,
+    totalBalance: Math.round(totalBalance),
     totalPoaps,
     ownsENSDomain: userOnchainData.domains.length ? true : false,
-    isXMTPEnabled: userOnchainData.xmtp.isXMTPEnabled,
+    isXMTPEnabled: userOnchainData.xmtp.isXMTPEnabled ? true : false,
   };
 };

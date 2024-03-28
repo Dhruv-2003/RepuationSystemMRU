@@ -58,6 +58,7 @@ export async function POST(
       status: 200,
     });
   } catch (error: any) {
+    console.log(error);
     return new Response(error, { status: 500 });
   }
 }
