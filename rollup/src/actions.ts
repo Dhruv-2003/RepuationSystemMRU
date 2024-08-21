@@ -2,6 +2,7 @@ import { ActionSchema, SolidityType } from "@stackr/sdk";
 
 // createAccountSchema is a schema for creating an account
 export const createRepScoreSchema = new ActionSchema("createRepScore", {
+  actionMessage: SolidityType.STRING,
   fid: SolidityType.UINT,
   engagementRankPercentile: SolidityType.UINT,
   castFrequency: SolidityType.UINT,
@@ -19,6 +20,7 @@ export const createRepScoreSchema = new ActionSchema("createRepScore", {
 });
 
 export const updateRepScoreSchema = new ActionSchema("updateRepScore", {
+  actionMessage: SolidityType.STRING,
   fid: SolidityType.UINT,
   engagementRankPercentile: SolidityType.UINT,
   castFrequency: SolidityType.UINT,

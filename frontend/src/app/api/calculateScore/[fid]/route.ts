@@ -47,6 +47,12 @@ export async function POST(
   { params }: { params: { fid: string } }
 ) {
   try {
+    const { actionMessage } = await request.json();
+    console.log(actionMessage);
+    if (!actionMessage) {
+      console.log("Username unavailable");
+      return;
+    }
     // invoker User calculateData and then get the score and detailed info to store it on the KV
     console.log(params.fid);
     const userFData = await getUserDataForFid({ fid: Number(params.fid) });
@@ -55,7 +61,10 @@ export async function POST(
       return;
     }
 
-    const userScoreData = await getDataForScore(userFData?.username);
+    const userScoreData = await getDataForScore(
+      userFData?.username,
+      actionMessage
+    );
 
     console.log(userScoreData);
     if (userScoreData) {

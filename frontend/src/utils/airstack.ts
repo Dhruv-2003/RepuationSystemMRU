@@ -18,7 +18,7 @@ export const getUserAllData = async (userHandle: string) => {
       console.log(error[0].locations);
     }
     if (data) {
-      const userData = data.Socials.Social[0];
+      const userData = data;
       return userData;
     }
   } catch (error) {

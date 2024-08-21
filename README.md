@@ -6,7 +6,6 @@ VeriCast is a reputation system developed for the Farcaster platform to address 
 
 ![WhatsApp Mar ](https://github.com/kushagrasarathe/frameworks/assets/76868364/713dd6bb-fa26-43ec-ba54-0ee17146c551)
 
-
 ## Problem
 
 Social media platforms often suffer from various challenges such as fake accounts, spam, and lack of transparency, resulting in diminished user experience. VeriCast addresses these issues by introducing a reputation system that tracks, analyzes, and rewards user engagement and authenticity.
@@ -40,12 +39,72 @@ VeriCast employs different APIs and services to fetch user data and calculate re
 - Integration of quest frames to allow users to earn additional points by completing streaks and participating in quests.
 - Implementation of the reputation algorithm within Micro Rollup to ensure trustlessness and verifiability.
 
-## Demo 
+## Demo
+
 You can see the live demo of [Vericast here](https://debugger.framesjs.org/?url=https://farcaster-reputation-engine.vercel.app/frames/dwr.eth)
 
 ## Presentation
 
 For a detailed overview of VeriCast, please refer to the [presentation](https://www.canva.com/design/DAGAaEMbAoU/gBbXimPUuScoQ1Nxxzr9AQ/edit?utm_content=DAGAaEMbAoU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton).
+
+## Project Structure
+
+```
+│
+├── rollup
+│   ├──  src
+│   │   ├── state.ts
+│   │   ├── machine.stackr.ts
+│   │   ├── actions.ts
+│   │   ├── transitions.ts
+│   │   ├── index.ts
+│   │   ├── reptation.ts
+│   │── stackr.config.ts
+│   │── deployment.json
+│
+├── frontend
+
+```
+
+## How to run ?
+
+## Step 1 Run the Micro rollup
+
+### Run using Node.js :rocket:
+
+```bash
+npm start
+```
+
+### Run using Docker :whale:
+
+- Build the image using the following command:
+
+```bash
+# For Linux
+docker build -t {{projectName}}:latest .
+
+# For Mac with Apple Silicon chips
+docker buildx build --platform linux/amd64,linux/arm64 -t {{projectName}}:latest .
+```
+
+- Run the Docker container using the following command:
+
+```bash
+# If using SQLite as the datastore
+docker run -v ./db.sqlite:/app/db.sqlite -p <HOST_PORT>:<CONTAINER_PORT> --name={{projectName}} -it {{projectName}}:latest
+
+# If using other URI based datastores
+docker run -p <HOST_PORT>:<CONTAINER_PORT> --name={{projectName}} -it {{projectName}}:latest
+```
+
+## Setp 2 Run frontend
+
+### Run backend using command :
+
+```bash
+bun run start
+```
 
 ## Contributors
 

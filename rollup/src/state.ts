@@ -92,23 +92,21 @@ export class ReputationSystem extends State<
     super(state);
   }
 
-  wrap(state: ReputationState): ReputationSystemTransport {
-    const newTree = new ReputationSystemTransport(state);
-    return newTree;
+  transformer() {
+    return {
+      wrap: () => {
+        return new ReputationSystemTransport(this.state);
+      },
+      unwrap: (wrappedState: ReputationSystemTransport): ReputationState => {
+        return wrappedState.userRepuations;
+      },
+    };
   }
 
-  clone(): State<ReputationState, ReputationSystemTransport> {
-    return new ReputationSystem(this.unwrap());
-  }
-
-  unwrap(): ReputationState {
-    return this.wrappedState.userRepuations;
-  }
-
-  calculateRoot(): BytesLike {
-    if (this.wrappedState.userRepuations.length === 0) {
+  getRootHash(): string {
+    if (this.state.length === 0) {
       return ZeroHash;
     }
-    return this.wrappedState.merkleTree.getHexRoot();
+    return this.transformer().wrap().merkleTree.getHexRoot();
   }
 }

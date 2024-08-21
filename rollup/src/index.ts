@@ -4,7 +4,7 @@ import { ActionEvents } from "@stackr/sdk";
 import { Playground } from "@stackr/sdk/plugins";
 import { schemas } from "./actions.ts";
 import { ReputationMachine, mru } from "./reputation.ts";
-import { reducers } from "./reducers.ts";
+import { transitions } from "./transitions.ts";
 import { stackrConfig } from "../stackr.config";
 
 const { domain } = stackrConfig;
@@ -17,15 +17,18 @@ const reputationMachine =
 const app = express();
 app.use(express.json());
 
-const playground = Playground.setup(mru);
+if (process.env.NODE_ENV === "development") {
+  const playground = Playground.init(mru);
 
-playground.addMethodOnHttpServer(
-  "get",
-  "/hello",
-  async (_req: Request, res: Response) => {
-    res.send("Hello World");
-  }
-);
+  playground.addGetMethod(
+    "/custom/hello",
+    async (_req: Request, res: Response) => {
+      res.json({
+        message: "Hello from the custom route",
+      });
+    }
+  );
+}
 
 const { actions, chain, events } = mru;
 
@@ -44,12 +47,12 @@ app.get("/blocks/:hash", async (req: Request, res: Response) => {
   if (!block) {
     return res.status(404).send({ message: "Block not found" });
   }
-  return res.send(block.data);
+  return res.send(block);
 });
 
 app.post("/:actionName", async (req: Request, res: Response) => {
   const { actionName } = req.params;
-  const actionReducer = reducers[actionName];
+  const actionReducer = transitions[actionName];
 
   if (!actionReducer) {
     res.status(400).send({ message: "no reducer for action" });
@@ -66,7 +69,11 @@ app.post("/:actionName", async (req: Request, res: Response) => {
   const schema = schemas[action];
 
   try {
-    const newAction = schema.newAction({ msgSender, signature, payload });
+    const newAction = schema.actionFrom({
+      msgSender,
+      signature,
+      inputs: payload,
+    });
     const ack = await mru.submitAction(actionName, newAction);
     res.status(201).send({ ack });
   } catch (e: any) {
@@ -84,13 +91,13 @@ events.subscribe(ActionEvents.EXECUTION_STATUS, async (action) => {
 });
 
 app.get("/", (_req: Request, res: Response) => {
-  return res.send({ state: reputationMachine?.state.unwrap() });
+  return res.send({ state: reputationMachine?.state });
 });
 
 app.get("/score/:fid", (_req: Request, res: Response) => {
   const { fid } = _req.params;
 
-  const state = reputationMachine?.state.unwrap();
+  const state = reputationMachine?.state;
   const userScore = state?.find((user) => user.fid === Number(fid));
   return res.send({ userScore });
 });

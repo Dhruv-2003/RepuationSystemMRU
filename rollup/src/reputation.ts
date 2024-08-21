@@ -8,11 +8,13 @@ type ReputationMachine = typeof reputationStateMachine;
 
 const mru = await MicroRollup({
   config: stackrConfig,
-  actions: [...Object.values(schemas)],
-  isSandbox: true,
+  actionSchemas: [schemas.createRepScore, schemas.updateRepScore],
+  stateMachines: [reputationStateMachine],
+  stfSchemaMap: {
+    createRepScore: schemas.createRepScore,
+    updateRepScore: schemas.updateRepScore,
+  },
 });
-
-mru.stateMachines.add(reputationStateMachine);
 
 await mru.init();
 

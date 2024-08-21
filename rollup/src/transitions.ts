@@ -1,14 +1,41 @@
-import { Reducers, STF } from "@stackr/sdk/machine";
+import { Transitions, STF } from "@stackr/sdk/machine";
 import {
   ReputationSystem,
   ReputationSystemTransport as StateWrapper,
   UserReputation,
 } from "./state";
-
+// import * as ed from "@noble/ed25519";
+import { ed25519 } from "@noble/curves/ed25519";
+import { Message } from "@farcaster/core";
+// import { webcrypto } from "node:crypto";
+// if (!globalThis.crypto) globalThis.crypto = webcrypto;
 // --------- Utilities ---------
 const findIndexOfFid = (state: StateWrapper, fid: number) => {
   return state.userRepuations.findIndex((user) => user.fid === fid);
 };
+
+// export const verifyFrameActionMessage = (messageBytes: string) => {
+//   const message = Message.decode(Buffer.from(messageBytes, "hex"));
+//   //   console.log(message);
+//   // const isVerified = nacl.sign.detached.verify(
+//   //   message.hash,
+//   //   message.signature,
+//   //   message.signer
+//   // );
+
+//   const isVerified = ed25519.verify(
+//     message.signature,
+//     message.hash,
+//     message.signer
+//   );
+
+//   if (isVerified) {
+//     console.log("Signature is valid.");
+//   } else {
+//     console.log("Signature is invalid.");
+//   }
+//   return isVerified;
+// };
 
 export interface calculateRepScoreInputsType {
   engagementRankPercentile: number;
@@ -93,6 +120,11 @@ const calculateRepScore = (
 // --------- State Transition Handlers ---------
 const createRepScoreHandler: STF<ReputationSystem> = {
   handler: ({ inputs, state, msgSender }) => {
+    // Check the Frame signed action message verification
+    // if (!verifyFrameActionMessage(inputs.actionMessage)) {
+    //   throw new Error("Frame Action Invalid");
+    // }
+
     if (
       inputs.engagementRankPercentile > 100 ||
       inputs.castFrequency > 150 ||
@@ -144,6 +176,11 @@ const createRepScoreHandler: STF<ReputationSystem> = {
 // --------- State Transition Handlers ---------
 const updateRepScoreHandler: STF<ReputationSystem> = {
   handler: ({ inputs, state, msgSender }) => {
+    // Check the Frame signed action message verification
+    // if (!verifyFrameActionMessage(inputs.actionMessage)) {
+    //   throw new Error("Frame Action Invalid");
+    // }
+
     if (
       inputs.engagementRankPercentile > 100 ||
       inputs.castFrequency > 150 ||
@@ -200,7 +237,7 @@ const updateRepScoreHandler: STF<ReputationSystem> = {
   },
 };
 
-export const reducers: Reducers<ReputationSystem> = {
+export const transitions: Transitions<ReputationSystem> = {
   createRepScore: createRepScoreHandler,
   updateRepScore: updateRepScoreHandler,
 };

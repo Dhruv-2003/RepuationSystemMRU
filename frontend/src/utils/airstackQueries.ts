@@ -7,6 +7,10 @@ export const userFidQuery = `query($handle: Identity) {
   ) {
     Social {
       id
+      socialCapital {
+        socialCapitalScoreRaw
+        socialCapitalScore
+      }
       chainId
       blockchain
       dappName
@@ -40,18 +44,70 @@ export const userFidQuery = `query($handle: Identity) {
       followingCount
     }
   }
+  FarcasterCasts(
+    input: {
+      filter: {
+        castedBy: {_eq: "fc_fname:$handle"}
+      },
+      blockchain: ALL,
+      limit: 100
+    }
+  ) {
+    Cast {
+      castedAtTimestamp
+      url
+      text
+      numberOfRecasts
+      numberOfLikes
+    }
+  }
+  FarcasterLikes: FarcasterReactions(
+    input: {
+      filter: {
+        criteria: liked,
+        reactedBy: {_eq: "fc_fname:$handle"}
+      },
+      blockchain: ALL,
+      limit: 100
+    }
+  ) {
+    Reaction {
+      cast {
+        castedAtTimestamp
+        embeds
+        url
+        text
+        numberOfRecasts
+        numberOfLikes
+      }
+    }
+  }
+  FarcasterRecast: FarcasterReactions(
+    input: {
+      filter: {
+        criteria: recasted,
+        reactedBy: {_eq: "fc_fname:$handle"}
+      },
+      blockchain: ALL,
+      limit: 100
+    }
+  ) {
+    Reaction {
+      cast {
+        castedAtTimestamp
+        embeds
+        url
+        text
+        numberOfRecasts
+        numberOfLikes
+      }
+    }
+  }
 }`;
 
 export const userOnchainQuery = `query ($address: Identity!) {
   Wallet(input: {identity: $address, blockchain: ethereum}) {
     ethereumBalance: tokenBalances(input: {blockchain: ethereum, limit: 25}) {
-      tokenAddress
-      tokenId
-      tokenType
-      formattedAmount
-      chainId
-    }
-    polygonBalance: tokenBalances(input: {blockchain: polygon, limit: 25}) {
       tokenAddress
       tokenId
       tokenType
@@ -67,17 +123,6 @@ export const userOnchainQuery = `query ($address: Identity!) {
     }
     ethereumTransfer: tokenTransfers(
       input: {blockchain: ethereum, limit: 25, filter: {_nor: {from: {_eq: "0x0000000000000000000000000000000000000000"}, to: {_eq: "0x0000000000000000000000000000000000000000"}}}}
-    ) {
-      tokenAddress
-      tokenId
-      tokenType
-      tokenIds
-      type
-      formattedAmount
-      blockTimestamp
-    }
-    polygonTransfer: tokenTransfers(
-      input: {blockchain: polygon, limit: 25, filter: {_nor: {from: {_eq: "0x0000000000000000000000000000000000000000"}, to: {_eq: "0x0000000000000000000000000000000000000000"}}}}
     ) {
       tokenAddress
       tokenId

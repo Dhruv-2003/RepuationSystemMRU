@@ -1,6 +1,6 @@
 import { StateMachine } from "@stackr/sdk/machine";
 import genesisState from "../genesis-state.json";
-import { reducers } from "./reducers";
+import { transitions } from "./transitions";
 import { ReputationSystem } from "./state";
 
 const STATE_MACHINES = {
@@ -9,8 +9,9 @@ const STATE_MACHINES = {
 
 const reputationStateMachine = new StateMachine({
   id: STATE_MACHINES.Reputation,
-  state: new ReputationSystem(genesisState.state),
-  on: reducers,
+  stateClass: ReputationSystem,
+  initialState: genesisState.state,
+  on: transitions,
 });
 
 export { STATE_MACHINES, reputationStateMachine };

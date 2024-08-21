@@ -1,6 +1,7 @@
 // ./app/frames/route.tsx
 /* eslint-disable react/jsx-key */
 import { UserReputation } from "@/utils/rollup";
+import { verifyFrameActionMessage } from "@/utils/verify";
 import { getUserDataForFid } from "frames.js";
 import { createFrames, Button } from "frames.js/next";
 
@@ -8,23 +9,15 @@ const frames = createFrames();
 
 const handleRequest = frames(async (ctx) => {
   console.log(ctx.message);
+
+  const req = ctx.request;
+  const body = await req.json();
+  // console.log(body);
+  // const isVerified = verifyFrameActionMessage(body);
+
   if (ctx.message) {
     // Get the users fid
     const userFid: number = ctx?.message.requesterFid;
-    // const _input = ctx.message.inputText;
-
-    // const userFData = await getUserDataForFid({ fid: userFid });
-    // const userHandle = userFData?.username;
-    // console.log(userHandle);
-
-    // const userHandle = _input;
-
-    // try to fetch the data for the user from the rollup
-    // get Data if present from KV
-    // const response = await fetch(
-    //   `${process.env.HOST}/api/calculateScore/${userFid}`
-    // );
-    // const userScoreData: UserReputation = await response.json();
     const res = await fetch(`${process.env.ROLLUP_HOST}/score/${userFid}`);
 
     const json = await res.json();
@@ -41,6 +34,9 @@ const handleRequest = frames(async (ctx) => {
       // send a POST request for generating the Score
       fetch(`${process.env.HOST}/api/calculateScore/${userFid}`, {
         method: "POST",
+        body: JSON.stringify({
+          actionMessage: body.trustedData.messageBytes,
+        }),
       });
 
       return {
