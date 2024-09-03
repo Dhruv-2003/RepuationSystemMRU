@@ -7,13 +7,10 @@ dotenv.config();
 import * as deployment from "./deployment.json";
 
 const stackrConfig: StackrConfig = {
-  stackrApp: {
-    appId: deployment.appId,
-    appInbox: deployment.appInbox,
-  },
+  isSandbox: true,
   sequencer: {
-    batchSize: 16,
-    batchTime: 1000,
+    blockSize: 16,
+    blockTime: 1000,
   },
   syncer: {
     slotTime: 1000,
@@ -32,8 +29,6 @@ const stackrConfig: StackrConfig = {
   domain: {
     name: "Stackr MVP v0",
     version: "1",
-    chainId: deployment.chainId,
-    verifyingContract: deployment.appInbox,
     salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
   },
   datastore: {

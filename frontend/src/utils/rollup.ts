@@ -4,8 +4,8 @@ import { CalculateRepScoreInputsType } from "./getDataViaAPIs";
 const domain = {
   name: "Stackr MVP v0",
   version: "1",
-  chainId: 15,
-  verifyingContract: "0x318797a65c1B1Af4d2B74E6Dca6d5f188BBF0F3F",
+  chainId: 69420,
+  verifyingContract: "0x1443D4D7D20038992d80a8A57a0C721ad6d8cBb8",
   salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
 };
 
@@ -38,17 +38,17 @@ export const createRepScoreAction = async (
     console.log(eip712Types);
     const date = new Date();
 
-    const payload = {
+    const inputs = {
       timestamp: Math.round(date.getTime() / 1000),
       ...userScoreData,
     };
 
-    const signature = await wallet.signTypedData(domain, eip712Types, payload);
+    const signature = await wallet.signTypedData(domain, eip712Types, inputs);
 
     const body = JSON.stringify({
       msgSender: wallet.address,
       signature,
-      payload,
+      inputs,
     });
 
     const res = await fetch(`${process.env.ROLLUP_HOST}/${actionName}`, {
@@ -81,17 +81,17 @@ export const updateRepScoreAction = async (
 
   const date = new Date();
 
-  const payload = {
+  const inputs = {
     timestamp: Math.round(date.getTime() / 1000),
     ...userScoreData,
   };
 
-  const signature = await wallet.signTypedData(domain, eip712Types, payload);
+  const signature = await wallet.signTypedData(domain, eip712Types, inputs);
 
   const body = JSON.stringify({
     msgSender: wallet.address,
     signature,
-    payload,
+    inputs,
   });
 
   const res = await fetch(`${process.env.ROLLUP_HOST}/${actionName}`, {

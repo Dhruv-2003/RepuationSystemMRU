@@ -16,11 +16,11 @@ const walletTwo = new Wallet(
 const getBody = async (actionName: ActionName, wallet: Wallet) => {
   const walletAddress = wallet.address;
   const date = new Date();
-  const payload =
+  const inputs =
     actionName == "createRepScore"
       ? {
+          actionMessage: "0x",
           fid: 4,
-          timestamp: Math.round(date.getTime() / 1000),
           engagementRankPercentile: 99,
           castFrequency: 150,
           postQuality: 40,
@@ -31,12 +31,13 @@ const getBody = async (actionName: ActionName, wallet: Wallet) => {
           totalOnChainTransfer: 65,
           totalOnChainBalance: 1500,
           totalPoaps: 15,
-          ownsENSDomain: true,
-          isXMTPEnabled: false,
+          ownsENSDomain: "true",
+          isXMTPEnabled: "false",
+          timestamp: 1725387310,
         }
       : {
+          actionMessage: "0x",
           fid: 3,
-          timestamp: Math.round(date.getTime() / 1000),
           engagementRankPercentile: 99,
           castFrequency: 140,
           postQuality: 40,
@@ -47,20 +48,29 @@ const getBody = async (actionName: ActionName, wallet: Wallet) => {
           totalOnChainTransfer: 65,
           totalOnChainBalance: 1500,
           totalPoaps: 15,
-          ownsENSDomain: true,
-          isXMTPEnabled: false,
+          ownsENSDomain: "true",
+          isXMTPEnabled: "false",
+          timestamp: Math.round(date.getTime() / 1000),
         };
 
+  console.log(inputs);
+  console.log(schemas[actionName].EIP712TypedData.types);
+
   const signature = await wallet.signTypedData(
-    domain,
+    {
+      chainId: 69420,
+      verifyingContract: "0x1443D4D7D20038992d80a8A57a0C721ad6d8cBb8",
+      ...domain,
+    },
     schemas[actionName].EIP712TypedData.types,
-    payload
+    inputs
   );
+  console.log(signature);
 
   const body = JSON.stringify({
     msgSender: walletAddress,
     signature,
-    payload,
+    inputs,
   });
 
   return body;

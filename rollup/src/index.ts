@@ -50,31 +50,26 @@ app.get("/blocks/:hash", async (req: Request, res: Response) => {
   return res.send(block);
 });
 
-app.post("/:actionName", async (req: Request, res: Response) => {
-  const { actionName } = req.params;
-  const actionReducer = transitions[actionName];
+app.post("/:reducerName", async (req: Request, res: Response) => {
+  const { reducerName } = req.params;
+  const actionReducer = transitions[reducerName];
 
   if (!actionReducer) {
     res.status(400).send({ message: "no reducer for action" });
     return;
   }
-  const action = actionName as keyof typeof schemas;
+  const action = reducerName as keyof typeof schemas;
 
-  const { msgSender, signature, payload } = req.body as {
-    msgSender: string;
-    signature: string;
-    payload: any;
-  };
+  const { msgSender, signature, inputs } = req.body;
+  console.log(msgSender);
+  console.log(signature);
+  console.log(inputs);
 
   const schema = schemas[action];
 
   try {
-    const newAction = schema.actionFrom({
-      msgSender,
-      signature,
-      inputs: payload,
-    });
-    const ack = await mru.submitAction(actionName, newAction);
+    const newAction = schema.actionFrom({ msgSender, signature, inputs });
+    const ack = await mru.submitAction(reducerName, newAction);
     res.status(201).send({ ack });
   } catch (e: any) {
     res.status(400).send({ error: e.message });
